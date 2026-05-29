@@ -1,199 +1,211 @@
+
 <!DOCTYPE html>
 <html lang="cs">
 <head>
 <meta charset="UTF-8">
-<title>Objednávka školního bufetu</title>
+<title>Objednávka zahradnictví</title>
 
 <style>
 body {
-    font-family: Arial;
-    background: #f4f7fb;
-}
-h1 {
-    text-align: center;
-    background: #2a72d4;
-    color: white;
-    padding: 20px;
-}
-.container {
-    width: 90%;
-    max-width: 500px;
-    margin: 30px auto;
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-}
-.item {
-    display: flex;
-    justify-content: space-between;
-    margin: 10px 0;
-}
-input[type="number"] {
-    width: 60px;
+  font-family: Arial;
+  background: #f4f7fb;
 }
 
-/* ✅ FORMULÁŘ */
-.form-group {
-    margin-top: 15px;
+header {
+  text-align: center;
+  margin-top: 20px;
 }
+
+header img {
+  max-width: 250px;
+}
+
+h1 {
+  text-align: center;
+  background: #2a72d4;
+  color: white;
+  padding: 20px;
+}
+
+.container {
+  width: 90%;
+  max-width: 500px;
+  margin: 30px auto;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+  margin: 10px 0;
+}
+
+input[type="number"] {
+  width: 60px;
+}
+
+/* FORMULÁŘ */
+.form-group {
+  margin-top: 15px;
+}
+
 .form-group input {
-    width: 100%;
-    padding: 8px;
+  width: 100%;
+  padding: 8px;
 }
 
 button {
-    width: 100%;
-    padding: 15px;
-    margin-top: 20px;
-    font-size: 20px;
+  width: 100%;
+  padding: 15px;
+  margin-top: 20px;
+  font-size: 20px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>SŠ Kostka – OBJEDNÁVKY BUFET</h1>
+<!-- ✅ LOGO -->
+<header>
+   firmy2.png" alt="Zahradnictví Brouček">
+</header>
+
+<h1>Zahradnictví Brouček – OBJEDNÁVKY</h1>
 
 <div class="container">
+  <div id="items"></div>
 
-<div id="items"></div>
+  <div id="celkem">Celkem: 0 Kč</div>
+  <div id="pocet">Počet: 0</div>
 
-<div id="celkem">Celkem: 0 Kč</div>
-<div id="pocet">Počet: 0</div>
+  <div class="form-group">
+    <label>VAŠE JMÉNO:</label>
+    <input type="text" id="jmeno" placeholder="Novák Jan">
+  </div>
 
-<!-- ✅ NOVÁ POLE -->
-<div class="form-group">
-<label>VAŠE JMÉNO:</label>
-<input type="text" id="jmeno" placeholder="Novák Jan">
-</div>
+  <div class="form-group">
+    <label>TELEFON:</label>
+    <input type="text" id="telefon" placeholder="+420 000 000 000">
+  </div>
 
-<div class="form-group">
-<label>TELEFON:</label>
-<input type="text" id="telefon" placeholder="+420 000 000 000">
-</div>
-
-<button onclick="odeslatObjednavku()">ODESLAT OBJEDNÁVKU</button>
-
+  <button onclick="odeslatObjednavku()">ODESLAT OBJEDNÁVKU</button>
 </div>
 
 <script>
-
 let items = [];
 
 // ✅ NAČTENÍ CSV
 async function loadCSV() {
-    const res = await fetch("data_bufet.csv");
-    const text = await res.text();
-    parseCSV(text);
-    renderItems();
+  const res = await fetch("Zahradnictvi.csv");
+  const text = await res.text();
+  parseCSV(text);
+  renderItems();
 }
 
 // ✅ PARSE CSV
 function parseCSV(text) {
-    let lines = text.split("\n");
+  let lines = text.split("\n");
+  for (let i = 1; i < lines.length; i++) {
+    let [nazev, cena] = lines[i].split(";");
+    if (!nazev || !cena) continue;
 
-    for (let i = 1; i < lines.length; i++) {
-        let [nazev, cena] = lines[i].split(";");
-        if (!nazev || !cena) continue;
-
-        items.push({
-            nazev: nazev.trim(),
-            cena: parseFloat(cena),
-            mnozstvi: 0
-        });
-    }
+    items.push({
+      nazev: nazev.trim(),
+      cena: parseFloat(cena),
+      mnozstvi: 0
+    });
+  }
 }
 
 // ✅ VYKRESLENÍ
 function renderItems() {
-    let container = document.getElementById("items");
+  let container = document.getElementById("items");
 
-    items.forEach((item, i) => {
-        let div = document.createElement("div");
-        div.className = "item";
+  items.forEach((item, i) => {
+    let div = document.createElement("div");
+    div.className = "item";
 
-        div.innerHTML = `
-            ${item.nazev} (${item.cena} Kč)
-            <input type="number" min="0" value="0"
-            onchange="updateItem(${i}, this.value)">
-        `;
+    div.innerHTML = `
+      ${item.nazev} (${item.cena} Kč)
+      <input type="number" min="0" value="0"
+      onchange="updateItem(${i}, this.value)">
+    `;
 
-        container.appendChild(div);
-    });
+    container.appendChild(div);
+  });
 }
 
 // ✅ UPDATE
 function updateItem(i, val) {
-    items[i].mnozstvi = parseInt(val) || 0;
-    updateSummary();
+  items[i].mnozstvi = parseInt(val) || 0;
+  updateSummary();
 }
 
 // ✅ SUMMARY
 function updateSummary() {
-    let total = 0;
-    let count = 0;
+  let total = 0;
+  let count = 0;
 
-    items.forEach(item => {
-        total += item.cena * item.mnozstvi;
-        count += item.mnozstvi;
-    });
+  items.forEach(item => {
+    total += item.cena * item.mnozstvi;
+    count += item.mnozstvi;
+  });
 
-    document.getElementById("celkem").innerText =
-        "Celkem: " + total + " Kč";
+  document.getElementById("celkem").innerText =
+    "Celkem: " + total + " Kč";
 
-    document.getElementById("pocet").innerText =
-        "Počet: " + count;
+  document.getElementById("pocet").innerText =
+    "Počet: " + count;
 }
 
-// ✅ HLAVNÍ MAILTO LOGIKA
+// ✅ ODESLÁNÍ
 function odeslatObjednavku() {
 
-    let jmeno = document.getElementById("jmeno").value.trim();
-    let telefon = document.getElementById("telefon").value.trim();
+  let jmeno = document.getElementById("jmeno").value.trim();
+  let telefon = document.getElementById("telefon").value.trim();
 
-    // ✅ VALIDACE
-    if (!jmeno || !telefon) {
-        alert("Vyplň jméno a telefon!");
-        return;
-    }
+  if (!jmeno || !telefon) {
+    alert("Vyplň jméno a telefon!");
+    return;
+  }
 
-    let vybrane = items.filter(i => i.mnozstvi > 0);
+  let vybrane = items.filter(i => i.mnozstvi > 0);
 
-    if (vybrane.length === 0) {
-        alert("Vyber aspoň jednu položku!");
-        return;
-    }
+  if (vybrane.length === 0) {
+    alert("Vyber aspoň jednu položku!");
+    return;
+  }
 
-    let text = "OBJEDNÁVKA\n\n";
-    text += "Jméno: " + jmeno + "\n";
-    text += "Telefon: " + telefon + "\n\n";
+  let text = "OBJEDNÁVKA – ZAHRADNICTVÍ\n\n";
+  text += "Jméno: " + jmeno + "\n";
+  text += "Telefon: " + telefon + "\n\n";
 
-    let total = 0;
-    let count = 0;
+  let total = 0;
+  let count = 0;
 
-    vybrane.forEach(i => {
-        let cena = i.cena * i.mnozstvi;
-        total += cena;
-        count += i.mnozstvi;
+  vybrane.forEach(i => {
+    let cena = i.cena * i.mnozstvi;
+    total += cena;
+    count += i.mnozstvi;
 
-        text += `${i.nazev} - ${i.mnozstvi} ks - ${cena} Kč\n`;
-    });
+    text += `${i.nazev} - ${i.mnozstvi} ks - ${cena} Kč\n`;
+  });
 
-    text += "\nCelkem kusů: " + count;
-    text += "\nCelková cena: " + total + " Kč";
+  text += "\nCelkem kusů: " + count;
+  text += "\nCelková cena: " + total + " Kč";
 
-    // ✅ MAILTO
-    let mail =
-        "mailto:simonik.kaub@kostka-skola.cz" +
-        "?subject=" + encodeURIComponent("Objednávka bufet") +
-        "&body=" + encodeURIComponent(text);
+  let mail =
+    "mailto:simonik.kaub@kostka-skola.cz" +
+    "?subject=" + encodeURIComponent("Objednávka zahradnictví") +
+    "&body=" + encodeURIComponent(text);
 
-    window.location.href = mail;
+  window.location.href = mail;
 }
 
 loadCSV();
-
 </script>
 
 </body>
-</html>
+</html
