@@ -16,7 +16,9 @@ header {
 }
 
 header img {
-  max-width: 250px;
+  max-width: 300px;
+  display: block;
+  margin: 0 auto;
 }
 
 h1 {
@@ -65,6 +67,7 @@ button {
 
 <body>
 
+<!-- ✅ LOGO -->
 <header>
   <img src="firmy2.png" alt="Zahradnictví Brouček">
 </header>
@@ -93,7 +96,6 @@ button {
 <script>
 let items = [];
 
-// NAČTENÍ CSV
 async function loadCSV() {
   const res = await fetch("Zahradnictvi.csv");
   const text = await res.text();
@@ -101,7 +103,6 @@ async function loadCSV() {
   renderItems();
 }
 
-// PARSE CSV
 function parseCSV(text) {
   let lines = text.split("\n");
   for (let i = 1; i < lines.length; i++) {
@@ -116,10 +117,9 @@ function parseCSV(text) {
   }
 }
 
-// VYKRESLENÍ
 function renderItems() {
   let container = document.getElementById("items");
-  container.innerHTML = ""; // důležité
+  container.innerHTML = "";
 
   items.forEach((item, i) => {
     let div = document.createElement("div");
@@ -135,13 +135,11 @@ function renderItems() {
   });
 }
 
-// UPDATE
 function updateItem(i, val) {
   items[i].mnozstvi = parseInt(val) || 0;
   updateSummary();
 }
 
-// SUMMARY
 function updateSummary() {
   let total = 0;
   let count = 0;
@@ -151,16 +149,11 @@ function updateSummary() {
     count += item.mnozstvi;
   });
 
-  document.getElementById("celkem").innerText =
-    "Celkem: " + total + " Kč";
-
-  document.getElementById("pocet").innerText =
-    "Počet: " + count;
+  document.getElementById("celkem").innerText = "Celkem: " + total + " Kč";
+  document.getElementById("pocet").innerText = "Počet: " + count;
 }
 
-// ODESLÁNÍ
 function odeslatObjednavku() {
-
   let jmeno = document.getElementById("jmeno").value.trim();
   let telefon = document.getElementById("telefon").value.trim();
 
